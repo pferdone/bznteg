@@ -33,6 +33,9 @@ class NNTPManager
     void connect();
     /** Close connection to server. **/
     void close();
+    /** Send buffer to the server. **/
+    void send(const Buffer8_t &buffer);
+    void send(const uint8_t *buffer, std::size_t size);
     /** If socket is connected to the server. **/
     bool isConnected() const;
     /** Poll server messages. **/
@@ -50,6 +53,8 @@ class NNTPManager
     void handleConnection(const boost::system::error_code& error);
     /** Handle socket read errors. **/
     void handleRead(const boost::system::error_code& error);
+    /** Handle socket send errors. **/
+    void handleSend(const boost::system::error_code& error);
 
     static NNTPManager *_instance;
     boost::asio::io_service _ioService;

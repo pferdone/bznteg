@@ -41,5 +41,5 @@ void Logger::destroy()
 //--------------------------------------------------------------------------------
 void Logger::log(const std::string &msg, uint8_t level)
 {
-  std::cout << "LEVEL[" << (int)level << "] " << msg << std::endl;
+  std::cout << (int)level << " " << msg << std::endl;
 }

@@ -12,6 +12,7 @@
 #include "../nntp_manager.h"
 #include "../logger.h"
 
+/** BT action that's trying to connect to our server. **/
 class BTActionConnect : public BTAction
 {
   public:

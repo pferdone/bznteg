@@ -56,6 +56,21 @@ void NNTPManager::close()
 }
 
 //--------------------------------------------------------------------------------
+void NNTPManager::send(const Buffer8_t &buffer)
+{
+  send(_buffer.data(), _buffer.size());
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::send(const uint8_t *buffer, std::size_t size)
+{
+  _socket.send(boost::asio::buffer(buffer, size));
+  /*_socket.async_send(boost::asio::buffer(buffer, size),
+        boost::bind(&NNTPManager::handleRead, this,
+        boost::asio::placeholders::error));*/
+}
+
+//--------------------------------------------------------------------------------
 bool NNTPManager::isConnected() const
 {
   return _socket.is_open();
@@ -102,4 +117,10 @@ void NNTPManager::handleConnection(const boost::system::error_code& error)
 void NNTPManager::handleRead(const boost::system::error_code& error)
 {
   std::cout << "read" << std::endl;
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::handleSend(const boost::system::error_code& error)
+{
+  std::cout << "send" << std::endl;
 }

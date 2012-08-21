@@ -1,0 +1,105 @@
+/*
+ * connection_manager.cpp
+ *
+ *  Created on: Aug 20, 2012
+ *      Author: pferdone
+ */
+
+#include "nntp_manager.h"
+
+NNTPManager *NNTPManager::_instance = 0;
+
+//--------------------------------------------------------------------------------
+NNTPManager::NNTPManager(const std::string &host, const std::string &port)
+  : _socket(_ioService)
+{
+  tcp::resolver resolver(_ioService);
+  tcp::resolver::query query(host, port);
+  _resIter = resolver.resolve(query);
+}
+
+//--------------------------------------------------------------------------------
+NNTPManager::~NNTPManager()
+{
+  _socket.close();
+}
+
+//--------------------------------------------------------------------------------
+NNTPManager& NNTPManager::getInstance(const std::string &host, const std::string &port)
+{
+  if (_instance==0) {
+    _instance = new NNTPManager(host, port);
+  }
+
+  return *_instance;
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::destroy()
+{
+  delete _instance;
+  _instance = 0;
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::connect()
+{
+  _socket.async_connect(_resIter->endpoint(),
+      boost::bind(&NNTPManager::handleConnection, this,
+      boost::asio::placeholders::error));
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::close()
+{
+  _socket.close();
+}
+
+//--------------------------------------------------------------------------------
+bool NNTPManager::isConnected() const
+{
+  return _socket.is_open();
+}
+
+//--------------------------------------------------------------------------------
+bool NNTPManager::poll()
+{
+  std::size_t bytes_available = _socket.available();
+  if (bytes_available>0) {
+    _buffer.clear();
+    _buffer.resize(bytes_available, 0);
+    _socket.async_read_some(boost::asio::buffer(_buffer.data(), _buffer.size()),
+        boost::bind(&NNTPManager::handleRead, this,
+        boost::asio::placeholders::error));
+  }
+
+  return bytes_available > 0;
+}
+
+//--------------------------------------------------------------------------------
+const Buffer8_t& NNTPManager::buffer() const
+{
+  return _buffer;
+}
+
+//--------------------------------------------------------------------------------
+uint32_t NNTPManager::getResponseCode() const
+{
+  uint32_t response_code = -1;
+  if (_buffer.size() >= 4) {
+    response_code = *(const uint32_t*)_buffer.data();
+  }
+  return response_code;
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::handleConnection(const boost::system::error_code& error)
+{
+  std::cout << "connect error" << std::endl;
+}
+
+//--------------------------------------------------------------------------------
+void NNTPManager::handleRead(const boost::system::error_code& error)
+{
+  std::cout << "read" << std::endl;
+}

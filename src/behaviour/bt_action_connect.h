@@ -10,6 +10,7 @@
 
 #include "bt_action.h"
 #include "../nntp_manager.h"
+#include "../logger.h"
 
 class BTActionConnect : public BTAction
 {

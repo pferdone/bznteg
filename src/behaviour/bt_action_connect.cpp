@@ -24,13 +24,26 @@ BTActionConnect::~BTActionConnect()
 uint8_t BTActionConnect::execute()
 {
   NNTPManager &nntp_mgr = NNTPManager::getInstance();
-  if (!_isConnecting) {
-    nntp_mgr.connect();
-    _isConnecting = true;
-  }
 
+  // first check if we are connected
   if (nntp_mgr.isConnected()) {
-    _state = SUCCEEDED;
+    if (nntp_mgr.poll()) {
+      Logger &logger = Logger::getInstance();
+      uint32_t response_code = nntp_mgr.getResponseCode();
+      if (response_code == SERVICE_AVAILABLE) {
+        logger.log("connected to server");
+        _state = SUCCEEDED;
+      } else {
+        logger.log("connection failed");
+        _state = FAILED;
+      }
+    }
+  } else {
+    // we are not connected -> connect to server
+    if (!_isConnecting) {
+      nntp_mgr.connect();
+      _isConnecting = true;
+    }
   }
 
   return _state;

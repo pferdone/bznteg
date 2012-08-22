@@ -19,3 +19,9 @@ BTBase::~BTBase()
 {
 
 }
+
+//--------------------------------------------------------------------------------
+void BTBase::setParent(BTBase *parent)
+{
+  _parent = parent;
+}

@@ -25,12 +25,12 @@ class NNTPManager
     ~NNTPManager();
 
     /** Returns an instance to the NNTPManager. **/
-    static NNTPManager& getInstance(const std::string &host = "", const std::string &port = "");
+    static NNTPManager& getInstance();
     /** Destroys the current instance of the NNTPManager. **/
     void destroy();
 
     /** Connect to server set in the constructor. **/
-    void connect();
+    bool connect(const std::string &host = "", const std::string &port = "");
     /** Close connection to server. **/
     void close();
     /** Send buffer to the server. **/
@@ -48,7 +48,7 @@ class NNTPManager
 
   private:
     /** Constructor. **/
-    NNTPManager(const std::string &host, const std::string &port);
+    NNTPManager();
     /** Handle connection errors. **/
     void handleConnection(const boost::system::error_code& error);
     /** Handle socket read errors. **/

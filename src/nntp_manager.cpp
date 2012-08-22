@@ -10,12 +10,9 @@
 NNTPManager *NNTPManager::_instance = 0;
 
 //--------------------------------------------------------------------------------
-NNTPManager::NNTPManager(const std::string &host, const std::string &port)
+NNTPManager::NNTPManager()
   : _socket(_ioService)
 {
-  tcp::resolver resolver(_ioService);
-  tcp::resolver::query query(host, port);
-  _resIter = resolver.resolve(query);
 }
 
 //--------------------------------------------------------------------------------
@@ -25,10 +22,10 @@ NNTPManager::~NNTPManager()
 }
 
 //--------------------------------------------------------------------------------
-NNTPManager& NNTPManager::getInstance(const std::string &host, const std::string &port)
+NNTPManager& NNTPManager::getInstance()
 {
   if (_instance==0) {
-    _instance = new NNTPManager(host, port);
+    _instance = new NNTPManager();
   }
 
   return *_instance;
@@ -42,11 +39,18 @@ void NNTPManager::destroy()
 }
 
 //--------------------------------------------------------------------------------
-void NNTPManager::connect()
+bool NNTPManager::connect(const std::string &host, const std::string &port)
 {
-  _socket.async_connect(_resIter->endpoint(),
-      boost::bind(&NNTPManager::handleConnection, this,
-      boost::asio::placeholders::error));
+  tcp::resolver resolver(_ioService);
+  tcp::resolver::query query(host, port);
+  try {
+    _resIter = resolver.resolve(query);
+    _socket.async_connect(_resIter->endpoint(),
+          boost::bind(&NNTPManager::handleConnection, this,
+          boost::asio::placeholders::error));
+    return true;
+  } catch(boost::exception &e) { }
+  return false;
 }
 
 //--------------------------------------------------------------------------------

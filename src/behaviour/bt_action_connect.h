@@ -8,6 +8,7 @@
 #ifndef BT_ACTION_CONNECT_H_
 #define BT_ACTION_CONNECT_H_
 
+#include <boost/timer.hpp>
 #include "bt_action.h"
 #include "../nntp_manager.h"
 #include "../logger.h"
@@ -17,7 +18,7 @@ class BTActionConnect : public BTAction
 {
   public:
     /** Constructor. **/
-    BTActionConnect();
+    BTActionConnect(const std::string &host, const std::string &port, double timeout=10);
     /** Destructor. **/
     virtual ~BTActionConnect();
 
@@ -26,6 +27,10 @@ class BTActionConnect : public BTAction
 
   private:
     bool _isConnecting;
+    const std::string _host;
+    const std::string _port;
+    double _timeout;
+    boost::timer _timer;
 };
 
 #endif /* BT_ACTION_CONNECT_H_ */

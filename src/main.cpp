@@ -11,8 +11,7 @@
 
 #include "behaviour/bt_action_connect.h"
 #include "behaviour/bt_action_authorize.h"
-
-typedef std::list<BTAction*> BTActionList_t;
+#include "behaviour/bt_sequence.h"
 
 /**
  * Main program entry point.
@@ -20,17 +19,16 @@ typedef std::list<BTAction*> BTActionList_t;
 int main(int argc, char **argv)
 {
   // initialize nntp manager
-  NNTPManager &nntp_mgr = NNTPManager::getInstance("reader.xsusenet.com", "119");
+  NNTPManager &nntp_mgr = NNTPManager::getInstance();
 
-  BTActionList_t bt_action_list;
-  bt_action_list.push_back(new BTActionConnect());
-  bt_action_list.push_back(new BTActionAuthorize("user", "pass"));
+  BTSequence seq;
+  seq.addAction(new BTActionConnect("reader.xsusenet.com", "119"));
+  seq.addAction(new BTActionAuthorize("user", "pass"));
 
-  for (BTActionList_t::iterator iter = bt_action_list.begin();
-       iter != bt_action_list.end();
-       ++iter) {
-    while((*iter)->execute()==IN_PROGRESS) {}
-  }
+  uint8_t result = IN_PROGRESS;
+  while((result=seq.execute())==IN_PROGRESS) {}
+
+  std::cout << "result:" << (int)result << std::endl;
 
   nntp_mgr.destroy();
 

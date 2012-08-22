@@ -19,6 +19,9 @@ class BTBase
     /** Destructor. **/
     virtual ~BTBase();
 
+    /** Set parent for this object. **/
+    void setParent(BTBase *parent);
+
   protected:
     /** Parent of this behaviour tree element. **/
     BTBase *_parent;

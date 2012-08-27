@@ -8,7 +8,8 @@
 #include "bt_action_connect.h"
 
 //--------------------------------------------------------------------------------
-BTActionConnect::BTActionConnect(const std::string &host, const std::string &port, double timeout)
+BTActionConnect::BTActionConnect(const std::string &host, const std::string &port,
+    double timeout)
   : _isConnecting(false),
     _host(host),
     _port(port),

@@ -34,7 +34,9 @@ enum NNTP_RESPONSE_CODES {
   HELP_TEXT_FOLLOWS             = 0x20303031,   // 100: help text follows
   SERVICE_AVAILABLE             = 0x20303032,   // 200: service available, posting allowed
   CLOSING_CONNECTION            = 0x20353032,   // 205: closing connection, goodbye
+  GROUP_SUCCESSFULLY_SELECTED   = 0x20313132,   // 211: group successfully selected
   INFORMATION_FOLLOWS           = 0x20353132,   // 215: information follows
+  ARTICLE_FOLLOWS               = 0x20303232,   // 220: article follows
   ARTICLE_POSTED_OK             = 0x20303432,   // 240: article posted ok
   AUTHENTICATION_ACCEPTED       = 0x20313832,   // 281: authentication accepted
   PASSWORD_REQUIRED             = 0x20313833,   // 381: password required

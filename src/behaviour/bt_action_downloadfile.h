@@ -10,6 +10,9 @@
 
 #include <iostream>
 #include <sstream>
+#include <fstream>
+#include <algorithm>
+#include <boost/regex.hpp>
 #include "bt_action.h"
 #include "../nntp_manager.h"
 #include "../logger.h"
@@ -31,6 +34,9 @@ class BTActionDownloadFile : public BTAction
     Segments_t::iterator _segIter;
     bool _isGroupSelected;
     bool _isDownloading;
+    std::ofstream _outFile;
+    std::size_t _outBytes;
+    Buffer8_t _buffer;
 };
 
 

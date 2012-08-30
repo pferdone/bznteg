@@ -13,7 +13,8 @@ BTActionDownloadFile::BTActionDownloadFile(NzbFile_s* nzb_file)
     _grpIter(nzb_file->groups.begin()),
     _segIter(nzb_file->segments.begin()),
     _isGroupSelected(false),
-    _isDownloading(false)
+    _isDownloading(false),
+    _outBytes(0)
 {
 }
 
@@ -44,12 +45,45 @@ uint8_t BTActionDownloadFile::execute()
             std::cout << "GROUP_SUCCESSFULLY_SELECTED" << std::endl;
           } else if (response_code == ARTICLE_FOLLOWS) {
             _isDownloading = true;
+            _buffer.insert(_buffer.end(), nntp_mgr.buffer().begin(), nntp_mgr.buffer().end());
           } else if (response_code == NO_SUCH_NEWSGROUP) {
-            std::cout << "NO_SUCH_NEWSGROUP" << std::endl;
             _grpIter++;
           }
         } else {
-          std::cout << "Downloading buffer size: " << nntp_mgr.buffer().size() << std::endl;
+          _buffer.insert(_buffer.end(), nntp_mgr.buffer().begin(), nntp_mgr.buffer().end());
+
+          static const Buffer8_t search = {'\n', '.'};
+          Buffer8_t::const_iterator found = std::search(nntp_mgr.buffer().begin(),
+              nntp_mgr.buffer().end(), search.begin(), search.end());
+
+          if (found!=nntp_mgr.buffer().end()) {
+            // RegEx: (?<=name=)[^\\s]+
+            boost::regex rx("(?<=name=)[^\\s]+");
+            boost::cmatch cm;
+            if (boost::regex_search((char*)_buffer.data(), cm, rx)) {
+              std::stringstream filename;
+              filename << cm[0].str() << "_" << (*_segIter)->number;
+
+              _outFile.open(filename.str().c_str(), std::fstream::binary);
+              _outFile.write((char*)_buffer.data(), _buffer.size()-2);
+              _outFile.close();
+
+              std::size_t num_files = std::distance(_nzbFile->segments.begin(), _nzbFile->segments.end());
+              std::size_t count = std::distance(_segIter, _nzbFile->segments.end());
+
+              std::cout << "Downloaded: " << cm[0].str() << " " << count << "/" << num_files << std::endl;
+
+              // reset
+              _buffer.clear();
+              _isGroupSelected = false;
+              _isDownloading = false;
+              _segIter++;
+            }
+          }
+
+          if (_segIter == _nzbFile->segments.end()) {
+            _state = SUCCEEDED;
+          }
         }
       }
     }

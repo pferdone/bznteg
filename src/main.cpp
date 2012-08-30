@@ -30,6 +30,7 @@ int main(int argc, char **argv)
   FileList_t file_list;
   if (!parseNzb("test.nzb", file_list)) return -1;
 
+  FileList_t::iterator iter = file_list.begin(); iter++; iter++;
 
   // initialize nntp manager
   NNTPManager &nntp_mgr = NNTPManager::getInstance();
@@ -37,7 +38,12 @@ int main(int argc, char **argv)
   BTSequence seq;
   seq.addAction(new BTActionConnect("reader.xsusenet.com", "119"));
   seq.addAction(new BTActionAuthorize("user", "pass"));
-  seq.addAction(new BTActionDownloadFile(file_list.front()));
+  for (FileList_t::iterator iter=file_list.begin();
+       iter!=file_list.end();
+       ++iter) {
+    seq.addAction(new BTActionDownloadFile((*iter)));
+  }
+
 
   uint8_t result = IN_PROGRESS;
   while((result=seq.execute())==IN_PROGRESS) {}

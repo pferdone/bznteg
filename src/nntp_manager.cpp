@@ -87,9 +87,7 @@ bool NNTPManager::poll()
   if (bytes_available>0) {
     _buffer.clear();
     _buffer.resize(bytes_available, 0);
-    _socket.async_read_some(boost::asio::buffer(_buffer.data(), _buffer.size()),
-        boost::bind(&NNTPManager::handleRead, this,
-        boost::asio::placeholders::error));
+    _socket.read_some(boost::asio::buffer(_buffer.data(), _buffer.size()));
   }
 
   return bytes_available > 0;
